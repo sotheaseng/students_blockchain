@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  recordId         Int      @id @map("record_id")
+  studentCode      String   @map("student_code")
+  firstName        String   @map("first_name")
+  lastName         String   @map("last_name")
+  sex              String
+  status           String   // INSERT, UPDATE, DELETE
+  version          Int
+  previousRecordId Int      @map("previous_record_id")
+  previousHash     String   @map("previous_hash")
+  currentHash      String   @map("current_hash")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("students")
+}
