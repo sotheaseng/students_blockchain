@@ -1,10 +1,37 @@
-import Link from "next/link"
-import { StudentBlockchain } from "@/lib/blockchain"
-import { format } from "date-fns"
+import Link from "next/link";
+import { StudentBlockchain } from "@/lib/blockchain";
+import { format } from "date-fns";
+
+interface StudentRecord {
+  recordId: number;
+  studentCode: string;
+  firstName: string;
+  lastName: string;
+  sex: "Male" | "Female" | string;
+  status: "INSERT" | "UPDATE" | "DELETE" | string;
+  version: number;
+  previousRecordId: number;
+  currentHash: string;
+  createdAt: string;
+}
 
 export default async function BlockchainPage() {
-  const students = await StudentBlockchain.getAllRecords()
-  const isValid = await StudentBlockchain.validateBlockchain()
+  let students: StudentRecord[] = [];
+  let isValid = false;
+
+  try {
+    students = await StudentBlockchain.getAllRecords();
+    isValid = await StudentBlockchain.validateBlockchain();
+  } catch (error) {
+    console.error("Failed to load blockchain data:", error);
+    // Optionally, return an error UI here or fallback content
+    return (
+      <div className="error-state">
+        <h2>Failed to load blockchain data</h2>
+        <p>Please try refreshing the page or come back later.</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -57,12 +84,11 @@ export default async function BlockchainPage() {
                       {student.firstName} {student.lastName}
                     </td>
                     <td>
-                      {student.sex === "Male" ? "♂️" : "♀️"} {student.sex}
+                      {student.sex === "Male" ? "♂️" : student.sex === "Female" ? "♀️" : "⚧️"} {student.sex}
                     </td>
                     <td>
                       <span className={`status-badge status-${student.status.toLowerCase()}`}>
-                        {student.status === "INSERT" ? "➕" : student.status === "UPDATE" ? "✏️" : "🗑️"}
-                        {student.status}
+                        {student.status === "INSERT" ? "➕" : student.status === "UPDATE" ? "✏️" : "🗑️"} {student.status}
                       </span>
                     </td>
                     <td>
@@ -120,5 +146,5 @@ export default async function BlockchainPage() {
         </ul>
       </div>
     </>
-  )
+  );
 }
